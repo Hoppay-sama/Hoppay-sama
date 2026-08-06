@@ -1,8 +1,8 @@
-<img src="https://capsule-render.vercel.app/api?type=venom&height=220&color=0:000000,100:a371f7&text=Oionos&fontSize=60&fontColor=FFFFFF&animation=fadeIn&fontAlignY=40&desc=%7C%20Backend%20Developer%20%7C%20Blockchain%20Developer%20%7C%20Data%20Analyst%20%7C&descSize=22&descColor=FFFFFF&descAlignY=65" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=venom&height=220&color=0:000000,100:a371f7&text=Oionos&fontSize=60&fontColor=FFFFFF&animation=fadeIn&fontAlignY=40" width="100%"/>
 
 <p align="center">
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3000&pause=1000&color=a371f7&center=true&vCenter=true&width=600&lines=Building+robust+backend+systems;Exploring+decentralized+technologies;Turning+data+into+insights" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3000&pause=1000&color=a371f7&center=true&vCenter=true&width=600&lines=Quality+Assurance+Automation+Engineer;Fullstack+Developer;Backend+Developer" alt="Typing SVG" />
   </a>
 </p>
 
@@ -117,7 +117,7 @@
 ## 🔗 Let's Connect
 
 <p align="center">
-  <a href="https://www.linkedin.com/in/hernandez-marc-lester-c-3083a3339/" target="_blank">
+  <a href="https://www.linkedin.com/in/marclesterhernandez/" target="_blank">
     <img src="https://raw.githubusercontent.com/gauravghongde/social-icons/9d939e1c5b7ea4a24ac39c3e4631970c0aa1b920/SVG/Color/LinkedIN.svg" alt="LinkedIn" width="40" height="40" />
   </a>
   &nbsp;&nbsp;
@@ -125,7 +125,7 @@
     <img src="https://raw.githubusercontent.com/gauravghongde/social-icons/9d939e1c5b7ea4a24ac39c3e4631970c0aa1b920/SVG/Color/Twitter.svg" alt="Twitter" width="40" height="40" />
   </a>
   &nbsp;&nbsp;
-  <a href="https://wa.me/6309946974716" target="_blank">
+  <a href="https://wa.me/639946974716" target="_blank">
     <img src="https://raw.githubusercontent.com/gauravghongde/social-icons/9d939e1c5b7ea4a24ac39c3e4631970c0aa1b920/SVG/Color/WhatsApp.svg" alt="WhatsApp" width="40" height="40" />
   </a>
   &nbsp;&nbsp;
