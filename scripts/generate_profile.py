@@ -437,8 +437,8 @@ def sprockets(svg: Svg, pal: dict, x0: float, y: float, w: float, hole_w=22, gap
     cx = x0 + (w - total) / 2
     for i in range(n):
         svg.add(
-            rect(cx + i * (hole_w + gap), y, hole_w, h, "#0A1122", 1.0, rx=2,
-                 stroke=pal["lineFaint"], sw=0.8)
+            rect(cx + i * (hole_w + gap), y, hole_w, h, "none", 1.0, rx=2,
+                 stroke=pal["line"], sw=0.9)
         )
 
 
@@ -916,7 +916,8 @@ def scene_divider(cfg, data, fonts: Fonts, mobile: bool):
     pal = cfg["palette"]
     W, H = (390, 20) if mobile else (820, 20)
     svg = Svg(W, H)
-    svg.add(rect(0, 0, W, H, pal["night"]))
+    # Deliberately no background: the splice strip floats on whatever theme
+    # renders it, so it never reads as a black bar on the page.
     sprockets(svg, pal, 0, 5.5, W, hole_w=22, gap=16, h=9)
     return svg
 
