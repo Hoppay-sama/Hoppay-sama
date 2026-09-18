@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="20" viewBox="0 0 390 20"><defs></defs><style>
+.b{opacity:0;animation:blockIn .7s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes blockIn{to{opacity:1}}
+.s{opacity:0;animation:starIn .8s ease-out forwards}
+@keyframes starIn{to{opacity:1}}
+.l{animation:lineDraw 1.2s ease-out forwards}
+@keyframes lineDraw{to{stroke-dashoffset:0}}
+.n{animation:nodeIn .5s ease-out forwards}
+@keyframes nodeIn{to{opacity:1}}
+.beacon{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.3}}
+.beam{animation:beamPulse 2.4s ease-in-out infinite}
+@keyframes beamPulse{0%,100%{opacity:.04}50%{opacity:.09}}
+.caret{animation:blink 1.2s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.f{animation:flicker 7s ease-in-out infinite}
+@keyframes flicker{0%,100%{opacity:.7}50%{opacity:.25}}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important}
+  .b{opacity:1 !important}
+  .l{stroke-dashoffset:0 !important}
+  .n,.s{opacity:1 !important}
+  .caret{opacity:1 !important}
+}
+</style><rect x="0.0" y="0.0" width="390.0" height="20.0" rx="0" fill="#04060C" opacity="1.0"/><rect x="13.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/><rect x="51.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/><rect x="89.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/><rect x="127.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/><rect x="165.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/><rect x="203.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/><rect x="241.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/><rect x="279.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/><rect x="317.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/><rect x="355.0" y="5.5" width="22.0" height="9.0" rx="2" fill="#0A1122" opacity="1.0" stroke="#141E36" stroke-width="0.8"/></svg>

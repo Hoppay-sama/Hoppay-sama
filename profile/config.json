@@ -1,0 +1,104 @@
+{
+  "$comment": "Night Signal - single source of truth for scripts/generate_profile.py",
+  "identity": {
+    "handle": "OIONOS",
+    "login": "Oionos",
+    "name": "MARC HERNANDEZ",
+    "role": "SOFTWARE ENGINEER",
+    "tagline": "I build systems that hold under pressure - full-stack, blockchain, and the space between.",
+    "availability": "OPEN TO WORK · REMOTE / PH",
+    "coords": "N 14.60° · E 120.98°",
+    "timezone": "Asia/Manila",
+    "tzLabel": "PHT"
+  },
+  "links": [
+    {
+      "id": "linkedin",
+      "label": "LINKEDIN",
+      "value": "/in/marclesterhernandez",
+      "url": "https://www.linkedin.com/in/marclesterhernandez/"
+    },
+    {
+      "id": "email",
+      "label": "EMAIL",
+      "value": "Xiannadev@gmail.com",
+      "url": "mailto:Xiannadev@gmail.com"
+    },
+    {
+      "id": "whatsapp",
+      "label": "WHATSAPP",
+      "value": "wa.me/639946974716",
+      "url": "https://wa.me/639946974716"
+    }
+  ],
+  "featured": [
+    {
+      "repo": "Veritras",
+      "category": "BLOCKCHAIN LEDGER",
+      "logline": "Supply-chain provenance, on-chain. Solidity, FastAPI, React."
+    },
+    {
+      "repo": "DesignVault",
+      "category": "DESIGN SYSTEM",
+      "logline": "30+ curated aesthetics with AI-ready prompts."
+    },
+    {
+      "repo": "Maghapon-Cafe",
+      "category": "WEB",
+      "logline": "A slow-coffee house, built in Astro."
+    }
+  ],
+  "stack": [
+    { "label": "LANGUAGES", "items": ["TypeScript", "JavaScript", "Python", "Rust"] },
+    { "label": "FRONTEND", "items": ["React", "Next.js", "Astro", "Tailwind"] },
+    { "label": "BACKEND", "items": ["Node", "Django", "FastAPI"] },
+    { "label": "DATA", "items": ["PostgreSQL", "SQLite"] },
+    { "label": "TOOLS", "items": ["Git", "Docker", "Vite", "Figma"] }
+  ],
+  "palette": {
+    "void": "#03050A",
+    "night": "#04060C",
+    "panel": "#0A0F1E",
+    "line": "#1B2748",
+    "lineFaint": "#141E36",
+    "ink": "#EAF1FA",
+    "inkDim": "#9AA7C2",
+    "inkFaint": "#5C6A88",
+    "cyan": "#8FD3FF",
+    "cyanDim": "#4E7FA8",
+    "star": "#C9D6E8",
+    "amber": "#E0A458"
+  },
+  "languages": {
+    "order": ["TypeScript", "Python", "Solidity", "Astro", "Other"],
+    "colors": {
+      "TypeScript": "#6FA8DC",
+      "Python": "#6DA8C9",
+      "Solidity": "#C98A6B",
+      "Astro": "#D9A05B",
+      "Other": "#3A4560"
+    }
+  },
+  "scene": {
+    "seed": 417,
+    "grain": 0.09,
+    "vignette": 0.55,
+    "regenUtc": "04:15",
+    "timecodes": {
+      "title": "00:00:00",
+      "watcher": "00:06:12",
+      "city": "00:12:40",
+      "records": "00:31:15",
+      "transmission": "00:47:00"
+    }
+  },
+  "variant": {
+    "hero": "A",
+    "city": "sparse"
+  },
+  "features": {
+    "portrait": false,
+    "localTime": true,
+    "moon": true
+  }
+}

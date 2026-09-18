@@ -236,4 +236,7 @@ README.md                    authored once: structure, text, picture embeds
 - Dark-only imagery in both GitHub themes; two artboard sizes per act.
 - Portrait: off (toggle retained in config).
 - Live elements: contribution skyline, featured repos, stats HUD, language
-  bar, local time. Last-activity line intentionally excluded.
+  bar, snapshot clock (SIGNAL hh:mm PHT, derived from the data fetch time so
+  regeneration stays deterministic). Last-activity line intentionally excluded.
+- Hero variant A (constellation-forward); city density sparse — both locked
+  in `profile/config.json` after the variant review round.
