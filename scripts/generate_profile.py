@@ -283,7 +283,13 @@ class Fonts:
     def path(self, face: str, text: str, size: float, tracking: float = 0.0) -> str:
         glyphs, cmap, hmtx, upm = self._face(face)
         scale = size / upm
-        digits = 0 if size < 10 else 1
+        # Smaller text needs MORE decimals, not fewer: scale = size/UPM is ~0.008
+        # at 8px, so a 1-em stem lands at ~0.6px. Rounding that to 0 digits
+        # (f"{0.4:.0f}" -> "0") collapses stems and bowls together and letters
+        # degrade to their skeletons (K-><, B->3, E->=). Keep enough decimals that
+        # ~0.05px of sub-pixel detail survives; the size cost is a few KB per
+        # artboard, well under budget.
+        digits = 2 if size < 12 else 1
         cursor = 0.0
         parts = []
         for ch in text:
