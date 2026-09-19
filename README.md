@@ -64,13 +64,14 @@ between. Currently open to work, remote from the Philippines.
   <picture>
     <source media="(max-width: 600px)" srcset="assets/act2-city-m.svg" />
     <img src="assets/act2-city.svg" width="100%"
-         alt="Act II card: one year of contributions drawn as a night skyline — tower height is weekly activity, lit windows are days that shipped, with commit, star and pull-request readouts." />
+         alt="Act II card: one year of contributions drawn as a night skyline — tower height is weekly activity, lit windows are days that shipped, a beacon marks the newest week, with commit, star and pull-request readouts and a language bar." />
   </picture>
 </p>
 
 A year of commits, built as a skyline. Every tower is a week; every lit window
-is a day that shipped; the beacon marks the current streak. The towers and the
-readouts above refresh daily from the GitHub API.
+is a day that shipped; the beacon sits on the newest week and the caption carries
+the live streak. Towers, readouts and the language bar refresh daily from the
+GitHub API.
 
 <p align="center">
   <picture>

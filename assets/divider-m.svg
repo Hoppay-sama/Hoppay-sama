@@ -9,8 +9,6 @@
 @keyframes nodeIn{to{opacity:1}}
 .beacon{animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.3}}
-.beam{animation:beamPulse 2.4s ease-in-out infinite}
-@keyframes beamPulse{0%,100%{opacity:.04}50%{opacity:.09}}
 .caret{animation:blink 1.2s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
 .f{animation:flicker 7s ease-in-out infinite}

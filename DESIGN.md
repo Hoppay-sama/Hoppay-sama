@@ -52,14 +52,23 @@ are the single sanctioned exception).
 | `lineFaint` | `#141E36` | Secondary strokes |
 | `ink` | `#EAF1FA` | Primary text |
 | `inkDim` | `#9AA7C2` | Body text |
-| `inkFaint` | `#5C6A88` | Microtype, non-essential |
+| `inkFaint` | `#7282A2` | Microtype, non-essential |
 | `cyan` | `#8FD3FF` | Signal: moonlight, structure, links |
-| `cyanDim` | `#4E7FA8` | Secondary signal |
+| `cyanDim` | `#5B8FB8` | Secondary signal, tower rooflines |
 | `star` | `#C9D6E8` | Starfield |
 | `amber` | `#E0A458` | Human heat: lit windows, streak beacon |
+| `ground` | `#060C1A` | Ground plane under the skyline (Act II) |
 
 Rules: backgrounds never lighter than `#0A0F1E`; all light is emitted, never
 flat-filled; cyan is structure, amber is life — do not swap their roles.
+
+**Legibility rule (round 1).** Text color is not a taste decision: the
+generator measures every token against every ground it can land on and refuses
+to build if a tier drops below its bar (§10.1). `inkFaint` and `cyanDim` carry
+labels and captions that are legible even though small, so they must clear AA
+4.5:1 across all nine grounds — the round-1 values (`#5C6A88` 3.74:1,
+`#4E7FA8` 4.26:1) failed and were replaced. Rooflines and other decorative
+strokes are exempt; text is not.
 
 Language signal hues (bar only, in order): TypeScript `#6FA8DC`, Python
 `#6DA8C9`, Solidity `#C98A6B`, Astro `#D9A05B`, Other `#3A4560`.
@@ -106,19 +115,49 @@ the art. ASCII portrait is a config toggle, default **off**; when enabled it
 occupies the left third and the manifest compresses to a column.
 
 ### Act II — THE CITY (`act2-city`, 820×560 / 390×720)
-The centerpiece. One tower per contribution week (all 52–53 desktop; mobile
-groups weeks in pairs, 26 towers);
-tower height maps weekly commit count through a clamped square-root curve so
-one huge week cannot dominate the skyline. Lit amber windows = days with
-commits; window count scales with that day's activity. A beacon marks the
-current streak position. HUD readout row: commits (12 mo), stars, pull
-requests (live), then the language signal bar. Caption microtype:
-"every lit window is a day you shipped." Live data: contribution calendar,
-stars, PRs, languages.
+The centerpiece. One tower per contribution week (52–53 desktop; mobile groups
+weeks in pairs, ~26 towers).
+
+Light model (round-1 rewrite): a light dome peaks at the skyline — darkest sky
+at the zenith, floor glow at the baseline, dark ground under the HUD — so the
+towers have something to silhouette against. Tower bodies are one bulk path on a
+shared vertical gradient (lit crown `#3E5484` → haze base `#212C46`, ≥ 2:1
+against the sky at every height). The round-1 `panel`-on-sky fill measured
+1.02:1, so the masses were invisible — that is why the skyline "did not survive
+render scale".
+
+Reading order, near to far: lit floor grid → moonlit rooflines (`cyanDim`, tall
+towers brighter) → tower masses → a darker offset back row (`lineFaint`, pure
+depth cue, no data) → stars → crescent moon (desktop).
+
+Data mapping: height = weekly commits through a `**0.78` curve (not sqrt — that
+flattened every week into the same ~200px tower), capped to the band so one huge
+week still cannot dominate. Lit amber windows = days with commits, stacked on a
+shared floor module (`FLOOR` 7px) and window column module (`COLP` 4.4px) so
+each tower reads as a facade rather than a dash-rain; every tower starts its
+stack on a different floor so the city does not light as one band. Window count
+scales with that day's activity (1 + min(count, 3)); the tallest weeks keep a
+crown light on; the near column is brighter (0.85) than the far (0.6).
+
+The beacon — a soft radial spill plus a pulsing plug, never a hard-edged
+polygon — sits on the newest lit week. There is no beam geometry: the round-1
+wedge was flat clip-art and pumped luminance (§6). The streak is stated as a
+live number in the caption instead (`STREAK nD`), which is what
+`current_streak()` feeds.
+
+HUD: months along the baseline (7:1 tier), then the readout row — commits
+(12 mo), stars, pull requests (live) — and the language signal bar, whose
+segments are labelled only when wide enough to read. Live data: contribution
+calendar, stars, PRs, languages.
 
 ### Act III — THE RECORDS (`act3-records`, 820×400 / 390×560)
 Up to four featured repositories as poster plaques: index, name (display),
 category label (cyan), logline (body), language, live star count (amber).
+The plate number `01`–`04` is a quiet `cyan` @ 0.07 watermark in the top-right,
+in the space the name leaves free; the name auto-shrinks (never below 17px) so
+it can never collide with it, and a hairline separates the footer row. Mobile
+plaques are 140px tall so a two-line logline fits — round 1 clipped it to one
+line and silently hid the rest of the sentence.
 Repos and order come from `profile/config.json` (`featured`), validated
 against the GitHub API at generation time; a repo that disappears degrades to
 "archive" instead of breaking the build. Live data: stars, languages.
@@ -149,7 +188,11 @@ Exact specification:
 | `scroll-cue` | Caret in scroll cue | blink 1200ms `steps(2)` infinite |
 
 Sequence budget for a title card: all entrance motion complete by 2400ms.
-Ambient loops must be luminance-neutral (no visible pumping).
+Ambient loops must be luminance-neutral (no visible pumping). Round 1 deleted a
+beam-pulse loop for breaking this: a large shape whose opacity breathes is a
+strobe at scale. Light geometry is gradient-edged — hard-edged light polygons
+(as the round-1 Act II wedge was) do not read as light and are banned with the
+rest of the clip-art vocabulary (§7).
 
 **Reduced motion:** every SVG contains
 `@media (prefers-reduced-motion: reduce)` that disables all animation and
@@ -183,8 +226,12 @@ blocks; any external URL inside an SVG.
   an image.
 - Chapter navigation uses native heading anchors.
 - Reduced motion honored (§6).
-- Body text contrast: `inkDim` on `night` ≥ 7:1; `inkFaint` microtype is
-  decorative only, never the sole carrier of meaning.
+- Contrast is gated, not asserted (§10.1): `ink`/`inkDim` ≥ 7:1 and
+  `cyan`/`cyanDim`/`inkFaint` ≥ 4.5:1, each measured against all nine grounds
+  the generator paints on; the build fails otherwise. `inkFaint` is reserved for
+  HUD chrome and captions — anything carrying data uses `inkDim`.
+- Microtype never drops below 7px, and a data label is omitted rather than set
+  when its space is too narrow to read (language-bar segments under 54px).
 
 ## 9. Architecture
 
@@ -192,6 +239,8 @@ blocks; any external URL inside an SVG.
 profile/config.json          identity, palette, features, featured repos, variant pick
 profile/github-data.json     cached API snapshot (offline dev + tests)
 scripts/generate_profile.py  sole generator: fetch → model → scenes → SVG
+scripts/render.py            local render harness: screenshots every artboard per round
+scripts/lint.py              gate 1: validity, self-containment, size, no live text
 assets/act*.svg              generated artboards (desktop + mobile)
 assets/divider.svg           sprocket divider strip
 assets/fonts/*.ttf + OFL     committed font sources with licenses
@@ -215,11 +264,15 @@ README.md                    authored once: structure, text, picture embeds
 
 1. SVG lint: valid XML; zero external references; no `<script>`; size budget
    ≤ 120 KB per artboard; font paths present, no `<text>` without intent.
+   Legibility: `audit_contrast()` runs on every build and fails it if any text
+   tier drops below its bar against any ground in §3. The measured worst case
+   per token is printed in the build log as a receipt.
 2. Deterministic regen: running the generator twice on the same data produces
    byte-identical files.
-3. Render harness: README rendered with GitHub-like styles at 1280 / 768 /
-   390 px, dark and light, plus reduced-motion pass; screenshots archived per
-   round.
+3. Render harness: `python scripts/render.py` screenshots every artboard at true
+   in-README pixel size (default through the reduced-motion path, so comps show
+   final states and §6 is exercised), and `--sheet` builds a contact sheet.
+   Rounds are judged at 1x from those screens, never from the source.
 4. GitHub-side: branch blob preview renders; proxy image loads verified on the
    live page; console and network clean.
 5. Ceiling gate: visual critic scored against the reference board — ≥ 8/10,

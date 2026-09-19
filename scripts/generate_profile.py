@@ -44,6 +44,67 @@ _NUM = re.compile(r"-?\d+\.\d+")
 def round_path(d: str, digits: int = 1) -> str:
     """Trim float precision in path data. 0.1px is invisible at these sizes."""
     return _NUM.sub(lambda m: f"{float(m.group()):.{digits}f}", d)
+
+
+# Sky ramp stops. Scenes must use these constants so the legibility gate below
+# audits the exact grounds the art is painted on (DESIGN.md §10.1).
+SKY_MID = "#060D20"     # city mid sky
+SKY_LOW = "#071026"     # title mid sky
+SKY_FLOOR = "#0A1430"   # city horizon glow
+SKY_TITLE = "#0B1632"   # title floor
+SKY_PANEL = "#070C1C"   # records backdrop
+GROUND = "#060C1A"      # ground below the skyline (HUD sits here)
+
+# Skyline modules: one floor pitch and one window column pitch shared by every
+# tower, so a year of weeks reads as a single city grid instead of noise.
+FLOOR = 7.0
+COLP = 4.4
+WIN_W = 2.6
+
+
+def _lin(c: float) -> float:
+    c /= 255.0
+    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+
+def luminance(hex_color: str) -> float:
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return 0.2126 * _lin(r) + 0.7152 * _lin(g) + 0.0722 * _lin(b)
+
+
+def contrast(fg: str, bg: str) -> float:
+    a, b = luminance(fg), luminance(bg)
+    hi, lo = (a, b) if a > b else (b, a)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+# Legibility gate (round 1 finding): every text token is measured against every
+# ground it can land on. Primary tiers carry the information, so they must clear
+# 7:1; the faintest tier is decoration and must still clear AA at 4.5:1.
+TEXT_GATE = {"ink": 7.0, "inkDim": 7.0, "inkFaint": 4.5, "cyan": 4.5, "cyanDim": 4.5}
+
+
+def audit_contrast(cfg: dict) -> list[str]:
+    pal = {**cfg["palette"], "skyMid": SKY_MID, "skyLow": SKY_LOW, "skyFloor": SKY_FLOOR,
+           "titleFloor": SKY_TITLE, "skyPanel": SKY_PANEL, "ground": GROUND}
+    grounds = [k for k in ("void", "night", "panel", "skyMid", "skyLow", "skyFloor",
+                           "titleFloor", "skyPanel", "ground") if k in pal]
+    notes, bad = [], []
+    for token, bar in TEXT_GATE.items():
+        ground, worst = "", 99.0
+        for g in grounds:
+            r = contrast(pal[token], pal[g])
+            if r < worst:
+                ground, worst = g, r
+        notes.append(f"  {token:<9} {worst:5.2f}:1 on {ground:<10} (bar {bar:g}:1)")
+        if worst < bar:
+            bad.append(f"{token} {worst:.2f}:1 on {ground} < {bar}:1")
+    if bad:
+        raise SystemExit("legibility gate failed: " + "; ".join(bad))
+    return notes
+
+
 ARTBOARDS = [
     ("act0-title", "title"),
     ("act1-watcher", "watcher"),
@@ -460,8 +521,6 @@ BASE_CSS = """
 @keyframes nodeIn{to{opacity:1}}
 .beacon{animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.3}}
-.beam{animation:beamPulse 2.4s ease-in-out infinite}
-@keyframes beamPulse{0%,100%{opacity:.04}50%{opacity:.09}}
 .caret{animation:blink 1.2s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
 .f{animation:flicker 7s ease-in-out infinite}
@@ -480,7 +539,7 @@ def scene_title(cfg, data, fonts: Fonts, mobile: bool):
     W, H = (390, 620) if mobile else (820, 430)
     svg = Svg(W, H)
     rng = random.Random(scene["seed"] + (7 if mobile else 0))
-    bg_gradient(svg, "bg", [(0, pal["void"], 1), (0.62, "#071026", 1), (1, "#0B1632", 1)])
+    bg_gradient(svg, "bg", [(0, pal["void"], 1), (0.62, SKY_LOW, 1), (1, SKY_TITLE, 1)])
     svg.add(rect(0, 0, W, H, "url(#bg)"))
     starfield(svg, rng, pal, 55 if mobile else 90, H * 0.85, W)
 
@@ -598,7 +657,7 @@ def scene_watcher(cfg, data, fonts: Fonts, mobile: bool):
     if mobile:
         ys = y + 42
         for group in cfg["stack"]:
-            text(svg, fonts, "mono", group["label"], 8, m, ys, pal["inkFaint"], 2)
+            text(svg, fonts, "mono", group["label"], 8, m, ys, pal["inkDim"], 2)
             text(svg, fonts, "mono", " · ".join(group["items"]), 9, m, ys + 16,
                  pal["inkDim"], 0.8)
             ys += 42
@@ -611,7 +670,7 @@ def scene_watcher(cfg, data, fonts: Fonts, mobile: bool):
             x = m + i * colw
             if i:
                 svg.add(line(x - 10, y0 - 26, x - 10, H - 34, pal["lineFaint"], 0.6, 0.7))
-            text(svg, fonts, "mono", group["label"], 8, x, y0, pal["inkFaint"], 2)
+            text(svg, fonts, "mono", group["label"], 8, x, y0, pal["inkDim"], 2)
             for j, item in enumerate(group["items"]):
                 text(svg, fonts, "mono", item, 9.5, x, y0 + 20 + j * 16, pal["inkDim"], 0.6)
 
@@ -650,27 +709,40 @@ def scene_city(cfg, data, fonts: Fonts, mobile: bool):
     W, H = (390, 720) if mobile else (820, 560)
     svg = Svg(W, H)
     rng = random.Random(scene["seed"] + (23 if mobile else 17))
-    bg_gradient(svg, "bg", [(0, pal["void"], 1), (0.55, "#060D20", 1), (1, "#0A1430", 1)])
+    baseline = H * 0.72 if mobile else 415.0
+    # Mobile carries more sky, so the band is taller: a quiet year otherwise
+    # left the poster two-thirds empty.
+    max_h = H * 0.46 if mobile else 265.0
+
+    # Light model: a light dome over the city, darkest sky at the zenith, and a
+    # dark ground under the HUD. Without the dome the masses had nothing to
+    # silhouette against (round 1: "the skyline doesn't survive render scale").
+    gy = baseline / H
+    bg_gradient(svg, "bg", [(0, pal["void"], 1), (gy * 0.5, SKY_MID, 1),
+                            (gy, SKY_FLOOR, 1), (1, GROUND, 1)])
     svg.add(rect(0, 0, W, H, "url(#bg)"))
-    starfield(svg, rng, pal, 40 if mobile else 80, H * 0.55, W)
+    starfield(svg, rng, pal, 40 if mobile else 80, H * 0.5, W)
 
     if cfg["features"]["moon"] and not mobile:
-        svg.add(circle(752, 88, 20, pal["star"], 0.05))
-        svg.add(circle(752, 88, 11, pal["star"], 0.16))
-        svg.add(circle(752, 88, 20, pal["cyan"], 0.04))
+        svg.add_def(
+            '<radialGradient id="moonglow">'
+            f'<stop offset="0" stop-color="{pal["cyan"]}" stop-opacity="0.16"/>'
+            f'<stop offset="0.4" stop-color="{pal["cyan"]}" stop-opacity="0.05"/>'
+            f'<stop offset="1" stop-color="{pal["cyan"]}" stop-opacity="0"/></radialGradient>'
+        )
+        svg.add(circle(688, 126, 48, "url(#moonglow)"))
+        svg.add(circle(688, 126, 15, pal["star"], 0.24))
+        # Carved disc -> crescent. A flat grey circle read as a blob at scale.
+        svg.add(circle(683, 123, 15.4, pal["void"], 0.94))
 
     text(svg, fonts, "mono", f"ACT II — THE CITY · {scene['timecodes']['city']}",
          8 if mobile else 9, 20, 30, pal["cyan"], 1.8)
 
+    streak = current_streak(data["days"])
     weeks = weeks_from_days(data["days"])
     n = len(weeks)
-    pitch = ((W - 2 * 18) / n) if mobile else ((W - 2 * 20) / n)
-    bw = pitch * 0.72
-    x0 = (W - n * pitch) / 2 + (pitch - bw) / 2
-    baseline = H * 0.64 if mobile else 440
-    max_h = H * 0.42 if mobile else 300
     if mobile:
-        # pair weeks so towers stay 13px+ wide
+        # pair weeks so towers stay ~10px wide
         merged = []
         for i in range(0, n - 1, 2):
             merged.append({"days": weeks[i]["days"] + weeks[i + 1]["days"],
@@ -679,67 +751,133 @@ def scene_city(cfg, data, fonts: Fonts, mobile: bool):
             merged.append(weeks[-1])
         weeks = merged
         n = len(weeks)
-        pitch = (W - 2 * 18) / n
-        bw = pitch * 0.72
-        x0 = (W - n * pitch) / 2 + (pitch - bw) / 2
+
+    margin = 18 if mobile else 20
+    pitch = (W - 2 * margin) / n
+    bw = pitch * (0.76 if mobile else 0.68)
+    x0 = (W - n * pitch) / 2 + (pitch - bw) / 2
 
     top = max(w["total"] for w in weeks) or 1
     rich = cfg["variant"]["city"] == "rich"
-    tower_bands: dict[float, list[str]] = {0.35: [], 0.55: [], 0.7: [], 0.85: [], 0.95: []}
-    win_bands: dict[float, list[str]] = {0.3: [], 0.5: [], 0.7: []}
-    edges: list[str] = []
+
+    # Heights are resolved before anything is drawn: the back row is sized from
+    # the median of the real skyline so scenery can never out-mass the data.
+    heights: list[float] = []
+    for wk in weeks:
+        if wk["total"] == 0:
+            heights.append(0.0)
+            continue
+        # .78 exponent keeps a real height spread; sqrt flattened every week
+        # into the same ~200px tower.
+        ratio = (wk["total"] / top) ** 0.78
+        heights.append(min(max_h, 16 + (max_h - 16) * ratio * rng.uniform(0.72, 1.02)))
+    lit_h = sorted(h for h in heights if h > 0)
+    median_h = lit_h[len(lit_h) // 2] if lit_h else max_h * 0.4
+
+    # Tower bodies are one bulk path on a shared vertical gradient: lit crown
+    # falling into haze at the base. The base stop must stay far enough from the
+    # sky to read as a mass (>= ~2:1); #151F38 measured 1.12:1 and vanished.
+    svg.add_def(
+        '<linearGradient id="tower" gradientUnits="userSpaceOnUse" '
+        f'x1="0" y1="{baseline - max_h:.0f}" x2="0" y2="{baseline:.0f}">'
+        '<stop offset="0" stop-color="#3E5484"/>'
+        '<stop offset="0.5" stop-color="#2C3A58"/>'
+        '<stop offset="1" stop-color="#212C46"/>'
+        '</linearGradient>'
+    )
+    # A darker, offset back row: pure depth cue, no data. Capped against the
+    # median of the real skyline — when it was sized off max_h it towered over
+    # the (generally short) real weeks and the scenery became the hero.
+    brng = random.Random(scene["seed"] + 91)
+    back: list[str] = []
+    cursor_x = x0 - pitch
+    while cursor_x < W - margin:
+        bh = min(median_h * brng.uniform(0.5, 1.05), max_h * 0.8)
+        back.append(rpath(cursor_x, baseline - bh, bw * 1.2, bh))
+        cursor_x += pitch * brng.uniform(0.85, 1.15)
+    back_path = f'<path d="{"".join(back)}" fill="{pal["lineFaint"]}" opacity="0.55"/>'
+
+    roof: list[str] = []       # moonlit rooflines: the silhouette reads by them
+    roof_lo: list[str] = []    # short towers keep a quieter edge
+    crown: list[str] = []      # top-floor light on the tallest weeks
+    body: list[str] = []
+    win_bands: dict[float, list[str]] = {0.85: [], 0.6: []}
     flickers: list[str] = []
+    lit_weeks = [i for i, w in enumerate(weeks) if w["total"] > 0]
+    newest_lit = lit_weeks[-1] if lit_weeks else -1
     beacon: tuple[float, float] | None = None
+
     for i, wk in enumerate(weeks):
         x = x0 + i * pitch
+        h = heights[i]
         if wk["total"] == 0:
-            tower_bands[0.35].append(rpath(x, baseline - 5, bw, 5))
+            body.append(rpath(x, baseline - 4, bw, 4))
             continue
-        h = 18 + (max_h - 18) * math.sqrt(wk["total"] / top) * rng.uniform(0.86, 1.0)
-        band = min(tower_bands, key=lambda b: abs(b - rng.uniform(0.55, 0.95)))
-        tower_bands[band].append(rpath(x, baseline - h, bw, h))
-        if not mobile:
-            edges.append(rpath(x, baseline - h, bw, 1.2))
-        beacon = (x + bw / 2, baseline - h)
-        days_lit = [d for d in wk["days"] if d["count"] > 0]
-        if days_lit and (rich or wk["total"] >= top * 0.35):
-            for j, day in enumerate(days_lit):
-                if not rich and rng.random() < 0.35:
-                    continue
-                wx = x + bw * (0.2 + 0.35 * (j % 2))
-                n_win = 1 + min(3, day["count"]) if rich else 1 + min(2, day["count"])
-                for _ in range(n_win):
-                    wy = baseline - rng.uniform(8, max(10, h - 5))
-                    if rng.random() < 0.06:
-                        flickers.append(
-                            rect(wx, wy, 2.6, 3.8, pal["amber"], 0.6, cls="f",
-                                 style=f"animation-delay:{rng.uniform(0, 6):.1f}s")
-                        )
-                    else:
-                        wop = min(win_bands, key=lambda b: abs(b - rng.uniform(0.25, 0.7)))
-                        win_bands[wop].append(rpath(wx, wy, 2.6, 3.8))
-    towers = ""
-    for op, subs in tower_bands.items():
-        if subs:
-            towers += f'<path d="{"".join(subs)}" fill="{pal["panel"]}" opacity="{op}"/>'
-    if edges:
-        towers += f'<path d="{"".join(edges)}" fill="{pal["line"]}" opacity="0.9"/>'
+        body.append(rpath(x, baseline - h, bw, h))
+        tall = h > max_h * 0.55
+        (roof if tall else roof_lo).append(rpath(x, baseline - h, bw, 1.4))
+        if h > max_h * 0.72:
+            roof.append(rpath(x, baseline - h - 0.6, bw, 0.6))
+        if i == newest_lit:
+            beacon = (x + bw / 2, baseline - h)
+
+        # Windows stack up a shared floor grid, so every tower reads as a facade
+        # rather than as scattered dashes (round 1 finding).
+        floors = max(1, int((h - 12) // FLOOR))
+        cols = max(1, int(bw // COLP))
+        # Every window column starts on its own floor. A single shared start
+        # lined the lit floors up across the whole city into one dashed stripe.
+        filled = [rng.randrange(0, max(1, floors // 2 + 1)) for _ in range(cols)]
+        for k, day in enumerate(d for d in wk["days"] if d["count"] > 0):
+            if not rich and rng.random() < 0.34:
+                continue
+            c = k % cols
+            for _ in range(1 + min(day["count"], 2 if mobile else 3)):
+                if filled[c] >= floors:
+                    break
+                wy = baseline - 8 - filled[c] * FLOOR
+                filled[c] += 1
+                wx = x + 2.4 + c * COLP
+                if rng.random() < 0.06:
+                    flickers.append(
+                        rect(wx, wy, WIN_W, 3.4, pal["amber"], 0.7, cls="f",
+                             style=f"animation-delay:{rng.uniform(0, 6):.1f}s")
+                    )
+                else:
+                    win_bands[0.85 if c == 0 else 0.6].append(rpath(wx, wy, WIN_W, 3.4))
+        if tall and floors > 2:
+            crown.append(rpath(x + bw / 2 - 1.4, baseline - h + 1.8, 2.8, 3.2))
+
+    towers = back_path
+    if body:
+        towers += f'<path d="{"".join(body)}" fill="url(#tower)" opacity="0.92"/>'
+    if roof_lo:
+        towers += f'<path d="{"".join(roof_lo)}" fill="{pal["cyanDim"]}" opacity="0.42"/>'
+    if roof:
+        towers += f'<path d="{"".join(roof)}" fill="{pal["cyanDim"]}" opacity="0.8"/>'
     for op, subs in win_bands.items():
         if subs:
             towers += f'<path d="{"".join(subs)}" fill="{pal["amber"]}" opacity="{op}"/>'
+    if crown:
+        towers += f'<path d="{"".join(crown)}" fill="{pal["amber"]}" opacity="0.95"/>'
     towers += "".join(flickers)
     if beacon:
-        beacon_x, beacon_top = beacon
-        towers += (
-            f'<polygon class="beam" points="{beacon_x - 6:.1f},{beacon_top:.1f} '
-            f'{beacon_x + 6:.1f},{beacon_top:.1f} {beacon_x + 16:.1f},{max(beacon_top - 120, 8):.1f} '
-            f'{beacon_x - 16:.1f},{max(beacon_top - 120, 8):.1f}" fill="{pal["amber"]}" opacity="0.055"/>'
+        bx, by = beacon
+        # A beacon, not a searchlight: a soft spill plus the pulsing plug. The
+        # old hard-edged wedge was flat clip-art and pumped luminance, which
+        # DESIGN.md §6 forbids (round 1 P0 finding).
+        svg.add_def(
+            '<radialGradient id="beaconglow">'
+            f'<stop offset="0" stop-color="{pal["amber"]}" stop-opacity="0.4"/>'
+            f'<stop offset="0.35" stop-color="{pal["amber"]}" stop-opacity="0.11"/>'
+            f'<stop offset="1" stop-color="{pal["amber"]}" stop-opacity="0"/></radialGradient>'
         )
-        towers += circle(beacon_x, beacon_top - 2, 2.6, pal["amber"], 0.9, cls="beacon")
+        towers += circle(bx, by - 3, 16, "url(#beaconglow)")
+        towers += circle(bx, by - 3, 2.6, pal["amber"], 0.95, cls="beacon")
     svg.add(f'<g class="b" style="animation-delay:.5s">{towers}</g>')
 
-    svg.add(line(18, baseline + 0.5, W - 18, baseline + 0.5, pal["line"], 0.8, 0.9))
-    months = {}
+    svg.add(line(margin, baseline + 0.5, W - margin, baseline + 0.5, pal["line"], 0.8, 0.9))
+    months: dict[int, int] = {}
     for i, wk in enumerate(weeks):
         for d in wk["days"]:
             dt = date.fromisoformat(d["date"])
@@ -750,55 +888,59 @@ def scene_city(cfg, data, fonts: Fonts, mobile: bool):
         if m_i % step:
             continue
         mx = x0 + idx * pitch
-        svg.add(line(mx, baseline + 1, mx, baseline + 5, pal["lineFaint"], 0.7, 0.9))
+        svg.add(line(mx, baseline + 1, mx, baseline + 5.5, pal["line"], 0.7, 1))
         name = date(2000, month, 1).strftime("%b").upper()
-        text(svg, fonts, "mono", name, 7, mx, baseline + 15, pal["inkFaint"], 1)
+        # Axis labels carry the data, so they sit in the 7:1 tier (round 1).
+        text(svg, fonts, "mono", name, 7.5 if mobile else 8, mx, baseline + 16,
+             pal["inkDim"], 1)
 
+    caption = ["ONE YEAR OF COMMITS, BUILT AS A SKYLINE",
+               f"EVERY LIT WINDOW IS A DAY YOU SHIPPED · STREAK {streak}D"]
     if mobile:
-        text(svg, fonts, "mono", "COMMITS AS A SKYLINE", 8, W - 20, 30, pal["inkFaint"], 1.6, "end")
-    else:
-        text(svg, fonts, "mono", "ONE YEAR OF COMMITS, BUILT AS A SKYLINE", 8,
-             W - 20, 30, pal["inkFaint"], 1.6, "end")
-        text(svg, fonts, "mono", "EVERY LIT WINDOW IS A DAY YOU SHIPPED", 8, W - 20, 46,
-             pal["inkFaint"], 1.6, "end", 0.75)
+        caption = [f"SKYLINE · STREAK {streak}D"]
+    for i, cap in enumerate(caption):
+        text(svg, fonts, "mono", cap, 7.5 if mobile else 8, W - margin,
+             30 + i * (14 if mobile else 16), pal["inkDim"], 1.6, "end")
 
-    sy = baseline + 55
-    svg.add(line(20, sy, W - 20, sy, pal["line"], 0.7, 0.7))
+    sy = (H - 128) if mobile else (baseline + 55)
+    svg.add(line(margin, sy - 15, W - margin, sy - 15, pal["line"], 0.7, 0.7))
     stats = [
         ("COMMITS · 12 MO", f"{data['totals']['commits12mo']:,}"),
         ("STARS", f"{data['totals']['stars']:,}"),
         ("PULL REQUESTS", f"{data['totals']['pullRequests']:,}"),
     ]
     if mobile:
-        widths = (W - 40) / 3
+        widths = (W - 2 * margin) / 3
         for i, (label, val) in enumerate(stats):
-            x = 20 + i * widths
-            text(svg, fonts, "mono", label, 7, x, sy + 24, pal["inkFaint"], 1.2)
-            text(svg, fonts, "display", val, 22, x, sy + 52, pal["ink"], 2.4)
-        by = sy + 78
+            x = margin + i * widths
+            text(svg, fonts, "mono", label, 7, x, sy, pal["inkDim"], 1.2)
+            text(svg, fonts, "display", val, 22, x, sy + 34, pal["ink"], 2.4)
+        by = H - 74
     else:
-        x = 40
+        x = margin + 20
         for label, val in stats:
-            text(svg, fonts, "mono", label, 8, x, sy + 22, pal["inkFaint"], 1.6)
-            text(svg, fonts, "display", val, 30, x, sy + 54, pal["ink"], 3)
-            x += 160
-        by = sy + 30
+            text(svg, fonts, "mono", label, 8, x, sy, pal["inkDim"], 1.6)
+            text(svg, fonts, "display", val, 30, x, sy + 35, pal["ink"], 3)
+            x += 150
+        by = sy + 23
 
     total_pct = sum(l["pct"] for l in langs) or 100
-    bx, bw_ = (20, W - 40) if mobile else (470, W - 490)
-    lane = 4 if not mobile else 5
-    svg.add(rect(bx, by - 8, bw_, lane, pal["lineFaint"], 1, rx=lane / 2))
+    bx, bw_ = (margin, W - 2 * margin) if mobile else (470, W - 490)
+    lane = 5 if mobile else 4
+    svg.add(rect(bx, by, bw_, lane, pal["lineFaint"], 1, rx=lane / 2))
     cursor = 0.0
     seg_bounds = []
     for l in langs:
         seg = bw_ * l["pct"] / total_pct
-        svg.add(rect(bx + cursor, by - 8, max(seg - 1, 1), lane,
+        svg.add(rect(bx + cursor, by, max(seg - 1, 1), lane,
                      cfg["languages"]["colors"].get(l["name"], pal["inkFaint"]), 0.95, rx=lane / 2))
         seg_bounds.append((cursor, cursor + seg, l))
         cursor += seg
-    for x0_, x1_, l in seg_bounds[:3]:
-        text(svg, fonts, "mono", f"{l['name']} {l['pct']}%", 7,
-             bx + (x0_ + x1_) / 2, by + 13, pal["inkFaint"], 0.8, "middle")
+    for x0_, x1_, l in seg_bounds:
+        if x1_ - x0_ < 54:  # too narrow to label without turning to mush
+            continue
+        text(svg, fonts, "mono", f"{l['name']} {l['pct']}%", 7.5 if mobile else 8,
+             bx + (x0_ + x1_) / 2, by + 14, pal["inkDim"], 0.8, "middle")
 
     hud_frame(svg, pal)
     vignette_grain(svg, pal, scene["grain"], scene["vignette"])
@@ -811,7 +953,7 @@ def scene_records(cfg, data, fonts: Fonts, mobile: bool):
     W, H = (390, 560) if mobile else (820, 400)
     svg = Svg(W, H)
     rng = random.Random(scene["seed"] + 5)
-    bg_gradient(svg, "bg", [(0, pal["night"], 1), (1, "#070C1C", 1)])
+    bg_gradient(svg, "bg", [(0, pal["night"], 1), (1, SKY_PANEL, 1)])
     svg.add(rect(0, 0, W, H, "url(#bg)"))
     starfield(svg, rng, pal, 24, H * 0.4, W, animate=False)
 
@@ -819,12 +961,14 @@ def scene_records(cfg, data, fonts: Fonts, mobile: bool):
          8 if mobile else 9, 20, 30, pal["cyan"], 1.8)
     if not mobile:
         text(svg, fonts, "mono", "LIVE STARS · UPDATED DAILY", 9,
-             W - 20, 30, pal["inkFaint"], 1.6, "end")
+             W - 20, 30, pal["inkDim"], 1.6, "end")
 
     featured = cfg["featured"]
     margin = 20
     if mobile:
-        gap, ph = 12, 124
+        # 140 tall so a two-line logline fits: truncating it to one line hid
+        # information (round 1 finding).
+        gap, ph = 12, 140
         y = 52
         boxes = [(margin, y + i * (ph + gap), W - 2 * margin, ph)
                  for i in range(len(featured))]
@@ -838,33 +982,46 @@ def scene_records(cfg, data, fonts: Fonts, mobile: bool):
         repo = data["repos"].get(item["repo"].lower(), {})
         stars = repo.get("stars", 0)
         lang = repo.get("language", "Code")
+        name = item["repo"].upper()
         svg.add(f'<g class="b" style="animation-delay:{0.25:.2f}s">')
-        svg.add(rect(bx, by, pw, ph, pal["panel"], 0.45))
+        svg.add(rect(bx, by, pw, ph, pal["panel"], 0.32))
         svg.add(f'<rect x="{bx}" y="{by}" width="{pw}" height="{ph}" fill="none" stroke="{pal["line"]}" stroke-width="0.8"/>')
         svg.add(line(bx, by, bx + 10, by, pal["cyan"], 1, 0.75))
         svg.add(line(bx, by, bx, by + 10, pal["cyan"], 1, 0.75))
         tx = bx + 16
+
+        # Plate number as a quiet watermark in the empty top-right, sized so it
+        # can never collide with the name (round 1: it read as a smudge when it
+        # sat on the star row at the bottom).
+        ghost = f"0{idx}"
+        ghost_size = 52 if mobile else 60
+        ghost_w = fonts.measure("display", ghost, ghost_size, 0)
+        name_size = 24.0 if mobile else 26.0
+        while name_size > 17 and fonts.measure("display", name, name_size, 4) > pw - 46 - ghost_w:
+            name_size -= 1
+        text(svg, fonts, "display", ghost, ghost_size, bx + pw - 14, by + 56,
+             pal["cyan"], 0, "end", 0.07)
+
         text(svg, fonts, "mono", f"0{idx} / FEATURE", 8, tx, by + 22,
-             pal["inkFaint"], 1.8)
-        text(svg, fonts, "display", item["repo"].upper(), 24 if mobile else 26, tx, by + 52,
-             pal["ink"], 4)
+             pal["inkDim"], 1.8)
+        text(svg, fonts, "display", name, name_size, tx, by + 52, pal["ink"], 4)
         text(svg, fonts, "mono", item["category"], 8, tx, by + 68, pal["cyan"], 2)
-        ll = fonts.wrap("body", item["logline"], 11 if mobile else 12, 0, pw - 32)
-        for i, ln in enumerate(ll[:1 if mobile else 3]):
-            text(svg, fonts, "body", ln, 11 if mobile else 12, tx, by + 90 + i * 17,
-                 pal["inkDim"], 0)
+        log = fonts.wrap("body", item["logline"], 11 if mobile else 12, 0, pw - 32)
+        for i, ln in enumerate(log[:2 if mobile else 3]):
+            text(svg, fonts, "body", ln, 11 if mobile else 12, tx,
+                 by + (86 + i * 15 if mobile else 92 + i * 17), pal["inkDim"], 0)
+
         fy = by + ph - 16
-        text(svg, fonts, "mono", lang.upper(), 8, tx, fy, pal["inkFaint"], 1.4)
+        svg.add(line(tx, fy - 13, bx + pw - 16, fy - 13, pal["line"], 0.6, 0.7))
+        text(svg, fonts, "mono", lang.upper(), 8, tx, fy, pal["inkDim"], 1.4)
         sw_ = fonts.measure("mono", str(stars), 9, 1.2)
         svg.add(f'<path transform="translate({bx + pw - 16 - sw_ - 14:.1f} {fy - 3:.1f})" '
                 f'd="{star_path(0, 0, 4.4)}" fill="{pal["amber"]}" opacity="0.9"/>')
         text(svg, fonts, "mono", str(stars), 9, bx + pw - 16, fy, pal["amber"], 1.2, "end")
-        text(svg, fonts, "display", f"0{idx}", 88 if not mobile else 64,
-             bx + pw - 18, by + ph - 20, pal["ink"], 0, "end", 0.06)
         svg.add("</g>")
 
     html = "NEXT — ACT IV · TRANSMISSION"
-    text(svg, fonts, "mono", html, 8, 20, H - 18, pal["inkFaint"], 1.6)
+    text(svg, fonts, "mono", html, 8, 20, H - 18, pal["inkDim"], 1.6)
     hud_frame(svg, pal)
     vignette_grain(svg, pal, scene["grain"] * 0.5, scene["vignette"] * 0.75)
     return svg
@@ -947,7 +1104,9 @@ def render_all(cfg: dict, data: dict, fonts: Fonts, out_dir: Path) -> list[tuple
                 if bad in markup:
                     raise SystemExit(f"self-containment check failed: {bad} in {name}{suffix}")
             path = out_dir / f"{name}{suffix}.svg"
-            path.write_text(markup, encoding="utf-8")
+            # newline="\n": without it Python writes os.linesep, so Windows and
+            # the Linux Action would produce different bytes for identical art.
+            path.write_text(markup, encoding="utf-8", newline="\n")
             receipt.append((f"{name}{suffix}.svg", len(markup.encode("utf-8"))))
     return receipt
 
@@ -965,12 +1124,15 @@ def main() -> int:
     args = ap.parse_args()
 
     cfg = json.loads(Path(args.config).read_text(encoding="utf-8"))
+    for line in audit_contrast(cfg):
+        print(line)
     if args.hero:
         cfg["variant"]["hero"] = args.hero
     if args.city:
         cfg["variant"]["city"] = args.city
     fonts = Fonts(Path(args.fonts))
 
+    snapshot: dict | None = None
     if args.demo:
         data = demo_data(cfg["scene"]["seed"], date.today())
     elif args.fetch:
@@ -979,12 +1141,13 @@ def main() -> int:
             print("GITHUB_TOKEN is required for --fetch", file=sys.stderr)
             return 2
         data = fetch_live(cfg, token)
-        Path(args.data).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.data).write_text(json.dumps(data, indent=2), encoding="utf-8")
+        snapshot = data
     else:
         data = json.loads(Path(args.data).read_text(encoding="utf-8"))
 
-    # Generate into a temp dir first; only a fully successful run replaces assets.
+    # Generate into a temp dir first; only a fully successful run replaces assets
+    # and only then is the snapshot written, so a failed build can never publish
+    # data that no artboard reflects.
     # ponytail: two-pass rename, atomic enough for a profile repo.
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -993,6 +1156,11 @@ def main() -> int:
         receipt = render_all(cfg, data, fonts, tmp_dir)
         for name, _ in receipt:
             shutil.move(str(tmp_dir / name), str(out / name))
+
+    if snapshot is not None:
+        Path(args.data).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.data).write_text(json.dumps(snapshot, indent=2), encoding="utf-8",
+                                   newline="\n")
 
     total = sum(size for _, size in receipt)
     for name, size in receipt:
