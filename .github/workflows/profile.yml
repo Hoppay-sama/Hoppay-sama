@@ -1,0 +1,65 @@
+name: Night Signal
+
+on:
+  schedule:
+    - cron: "15 4 * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "profile/config.json"
+      - "scripts/**"
+      - "assets/**"
+      - "requirements.txt"
+      - ".github/workflows/profile.yml"
+  push:
+    branches: [main]
+    paths:
+      - "profile/config.json"
+      - "scripts/generate_profile.py"
+      - "assets/fonts/**"
+      - "requirements.txt"
+      - ".github/workflows/profile.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: night-signal
+  cancel-in-progress: true
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install generator dependencies
+        run: pip install -r requirements.txt
+
+      - name: Regenerate artboards from live GitHub data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/generate_profile.py --fetch
+
+      - name: Verify artboards (gate 1)
+        run: python scripts/lint.py
+
+      - name: Commit if artboards changed
+        # Verify-only on pull requests: a bot commit would push into the
+        # contributor's branch.
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "oionos-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets profile
+          if git diff --cached --quiet; then
+            echo "No changes to publish."
+          else
+            git commit -m "chore: regenerate night signal artboards"
+            git push
+          fi

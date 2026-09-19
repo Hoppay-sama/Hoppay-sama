@@ -1,143 +1,131 @@
-<img src="https://capsule-render.vercel.app/api?type=venom&height=220&color=0:000000,100:a371f7&text=Oionos&fontSize=60&fontColor=FFFFFF&animation=fadeIn&fontAlignY=40" width="100%"/>
+<!-- Night Signal — every artboard is generated from live GitHub data. See DESIGN.md. -->
 
 <p align="center">
-  <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3000&pause=1000&color=a371f7&center=true&vCenter=true&width=600&lines=Web+Developer;Blockchain+Engineer;Quality+Assurance+Automation+Engineer;Fullstack+Developer;Backend+Developer;Software+Developer;Mobile+App+Developer" alt="Typing SVG" />
-  </a>
+  <picture>
+    <source media="(max-width: 600px)" srcset="assets/act0-title-m.svg" />
+    <img src="assets/act0-title.svg" width="100%"
+         alt="Title card: an omen-bird constellation over the wordmark OIONOS — Marc Hernandez, Software Engineer." />
+  </picture>
 </p>
 
 <p align="center">
-  <a href="https://komarev.com/ghpvc/?username=Hoppay-sama">
-    <img src="https://komarev.com/ghpvc/?username=Hoppay-sama&label=Profile%20views&color=a371f7&style=flat-square" alt="Profile views" />
-  </a>
-</p>
-
-<br>
-
-## 👋 About Me
-
-<p align="center">
-  I'm a developer passionate about crafting scalable backend architectures, <br>
-  diving deep into blockchain ecosystems, and extracting meaningful stories from raw data. <br>
-  I believe clean code and intuitive design go hand in hand.
-</p>
-
-<br>
-
-<img src="https://capsule-render.vercel.app/api?type=rect&height=2&color=a371f7" width="100%"/>
-
-<br>
-
-## 📊 GitHub Analytics
-
-<table align="center">
-  <tr>
-    <td>
-      <a href="https://github.com/Hoppay-sama">
-        <img height="170em" src="https://github-readme-stats-eight-theta.vercel.app/api?username=Hoppay-sama&cache_seconds=7200&layout=compact&theme=nightowl&border_radius=10&hide_title=false" alt="GitHub Stats" />
-      </a>
-    </td>
-    <td>
-      <img height="170em" src="https://streak-stats.demolab.com/?user=Hoppay-sama&theme=nightowl&hide_border=true&cache_seconds=86400" alt="GitHub Streak" />
-    </td>
-  </tr>
-</table>
-
-<p align="center">
-  <img height="180em" src="https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username=Hoppay-sama&langs_count=8&layout=compact&theme=nightowl&border_radius=10" alt="Top Languages" />
+  <sub>
+    I · <a href="#act-i--the-watcher">The Watcher</a> &nbsp;·&nbsp;
+    II · <a href="#act-ii--the-city">The City</a> &nbsp;·&nbsp;
+    III · <a href="#act-iii--the-records">The Records</a> &nbsp;·&nbsp;
+    IV · <a href="#act-iv--transmission">Transmission</a>
+  </sub>
 </p>
 
 <p align="center">
-  <img src="https://trophy.ryglcloud.net/?username=Hoppay-sama&theme=nightowl&no-frame=true&no-bg=true&margin-w=4&cache_seconds=86400" alt="GitHub Trophies" />
+  <picture>
+    <source media="(max-width: 600px)" srcset="assets/divider-m.svg" />
+    <img src="assets/divider.svg" width="100%" alt="" />
+  </picture>
+</p>
+
+## Act I — The Watcher
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px)" srcset="assets/act1-watcher-m.svg" />
+    <img src="assets/act1-watcher.svg" width="100%"
+         alt="Act I card: bio and equipment manifest — languages, frontend, backend, data, tools." />
+  </picture>
+</p>
+
+I build systems that hold under pressure — full-stack, blockchain, and the space
+between. Currently open to work, remote from the Philippines.
+
+<details>
+  <summary>Equipment manifest</summary>
+  <br>
+
+  | | |
+  |---|---|
+  | Languages | TypeScript · JavaScript · Python · Rust |
+  | Frontend | React · Next.js · Astro · Tailwind |
+  | Backend | Node · Django · FastAPI |
+  | Data | PostgreSQL · SQLite |
+  | Tools | Git · Docker · Vite · Figma |
+
+</details>
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px)" srcset="assets/divider-m.svg" />
+    <img src="assets/divider.svg" width="100%" alt="" />
+  </picture>
+</p>
+
+## Act II — The City
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px)" srcset="assets/act2-city-m.svg" />
+    <img src="assets/act2-city.svg" width="100%"
+         alt="Act II card: one year of contributions drawn as a night skyline — tower height is weekly activity, lit windows are days that shipped, a beacon marks the newest week, with commit, star and pull-request readouts and a language bar." />
+  </picture>
+</p>
+
+A year of commits, built as a skyline. Every tower is a week; every lit window
+is a day that shipped; the beacon sits on the newest week and the caption carries
+the live streak. Towers, readouts and the language bar refresh daily from the
+GitHub API.
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px)" srcset="assets/divider-m.svg" />
+    <img src="assets/divider.svg" width="100%" alt="" />
+  </picture>
+</p>
+
+## Act III — The Records
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px)" srcset="assets/act3-records-m.svg" />
+    <img src="assets/act3-records.svg" width="100%"
+         alt="Act III card: featured projects as poster plaques with language and live star counts." />
+  </picture>
+</p>
+
+- **[Veritras](https://github.com/Oionos/Veritras)** — blockchain ledger ·
+  supply-chain provenance, on-chain. Solidity, FastAPI, React.
+- **[DesignVault](https://github.com/Oionos/DesignVault)** — design system ·
+  30+ curated aesthetics with AI-ready prompts.
+- **[Maghapon-Cafe](https://github.com/Oionos/Maghapon-Cafe)** — web ·
+  a slow-coffee house, built in Astro.
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px)" srcset="assets/divider-m.svg" />
+    <img src="assets/divider.svg" width="100%" alt="" />
+  </picture>
+</p>
+
+## Act IV — Transmission
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px)" srcset="assets/act4-transmission-m.svg" />
+    <img src="assets/act4-transmission.svg" width="100%"
+         alt="Act IV card: end credits with contact channels." />
+  </picture>
 </p>
 
 <p align="center">
-  <img height="260em" src="https://github-readme-activity-graph.vercel.app/graph?username=Hoppay-sama&theme=nightowl&radius=10&area=true" alt="Activity Graph" />
+  <a href="https://www.linkedin.com/in/marclesterhernandez/">LinkedIn</a> &nbsp;·&nbsp;
+  <a href="mailto:Xiannadev@gmail.com">Email</a> &nbsp;·&nbsp;
+  <a href="https://wa.me/639946974716">WhatsApp</a>
 </p>
 
-<div align="center">
-  <img src="profile-3d-city.svg" alt="3D City" width="100%" />
-</div>
-
-<br>
-
-<img src="https://capsule-render.vercel.app/api?type=rect&height=2&color=a371f7" width="100%"/>
-
-<br>
-
-## 🛠️ Tech Stack
-
-<table align="center">
-  <tr>
-    <td align="center"><strong>Languages</strong></td>
-    <td align="center"><strong>Frontend</strong></td>
-    <td align="center"><strong>Backend</strong></td>
-    <td align="center"><strong>Database</strong></td>
-    <td align="center"><strong>Tools</strong></td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="JavaScript" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="TypeScript" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="Python" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/rust/rust-original.svg" alt="Rust" width="36" height="36" />
-    </td>
-    <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="React" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nextjs/nextjs-original.svg" alt="Next.js" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg" alt="HTML5" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg" alt="CSS3" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/bootstrap/bootstrap-original.svg" alt="Bootstrap" width="36" height="36" />
-    </td>
-    <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" alt="Node.js" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/django/django-plain.svg" alt="Django" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/flask/flask-original.svg" alt="Flask" width="36" height="36" />
-    </td>
-    <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg" alt="PostgreSQL" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/sqlite/sqlite-original.svg" alt="SQLite" width="36" height="36" />
-    </td>
-    <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/git/git-original.svg" alt="Git" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vscode/vscode-original.svg" alt="VS Code" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/figma/figma-original.svg" alt="Figma" width="36" height="36" /><br>
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vitejs/vitejs-original.svg" alt="Vite" width="36" height="36" />
-    </td>
-  </tr>
-</table>
-
-<br>
-
-<img src="https://capsule-render.vercel.app/api?type=rect&height=2&color=a371f7" width="100%"/>
-
-<br>
-
-## 🔗 Let's Connect
+---
 
 <p align="center">
-  <a href="https://www.linkedin.com/in/marclesterhernandez/" target="_blank">
-    <img src="https://raw.githubusercontent.com/gauravghongde/social-icons/9d939e1c5b7ea4a24ac39c3e4631970c0aa1b920/SVG/Color/LinkedIN.svg" alt="LinkedIn" width="40" height="40" />
-  </a>
-  &nbsp;&nbsp;
-  <a href="https://x.com/Hoppay3" target="_blank">
-    <img src="https://raw.githubusercontent.com/gauravghongde/social-icons/9d939e1c5b7ea4a24ac39c3e4631970c0aa1b920/SVG/Color/Twitter.svg" alt="Twitter" width="40" height="40" />
-  </a>
-  &nbsp;&nbsp;
-  <a href="https://wa.me/639946974716" target="_blank">
-    <img src="https://raw.githubusercontent.com/gauravghongde/social-icons/9d939e1c5b7ea4a24ac39c3e4631970c0aa1b920/SVG/Color/WhatsApp.svg" alt="WhatsApp" width="40" height="40" />
-  </a>
-  &nbsp;&nbsp;
-  <a href="mailto:Xiannadev@gmail.com" target="_blank">
-    <img src="https://raw.githubusercontent.com/gauravghongde/social-icons/9d939e1c5b7ea4a24ac39c3e4631970c0aa1b920/SVG/Color/Gmail.svg" alt="Gmail" width="40" height="40" />
-  </a>
+  <sub>
+    Night Signal · art regenerated daily from the GitHub API ·
+    <a href="scripts/generate_profile.py">generator</a> ·
+    <a href="DESIGN.md">design</a>
+  </sub>
 </p>
-
-<br>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/abozanona/abozanona/output/pacman-contribution-graph-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/abozanona/abozanona/output/pacman-contribution-graph.svg">
-  <img alt="Pacman contribution graph" src="https://raw.githubusercontent.com/abozanona/abozanona/output/pacman-contribution-graph.svg" width="100%">
-</picture>
