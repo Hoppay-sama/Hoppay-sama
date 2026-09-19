@@ -1,0 +1,15 @@
+# Generated SVGs are the product, and verification depends on byte-identity
+# between a local run and the Linux Action. Everything text is LF in the repo
+# AND in the working tree, so `generate_profile.py` output diffs cleanly.
+* text=auto eol=lf
+*.svg text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.txt text eol=lf
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.png binary
